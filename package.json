@@ -24,6 +24,7 @@
     "@types/node": "^24.0.12",
     "@types/nunjucks": "^3.2.6",
     "nodemon": "^3.1.10",
+    "nunjucks-date-filter": "^0.1.1",
     "prettier": "^3.6.2",
     "prettier-plugin-jinja-template": "^2.1.0",
     "ts-node": "^10.9.2"

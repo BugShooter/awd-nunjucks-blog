@@ -1,0 +1,33 @@
+{% extends "_baseLayout.html" %}
+
+{% macro postPreview(post) %}
+{% set url = "post.html" %}
+{% set title = post.title %}
+{% set teaser = post.teaser %}
+{% set author = post.author %}
+{% set createdAt = post.createdAt %}
+<!-- Post preview-->
+<div class="post-preview">
+    <a href="{{ url }}">
+        <h2 class="post-title">{{ title }}</h2>
+        <h3 class="post-subtitle">{{ teaser }}</h3>
+    </a>
+    <p class="post-meta">
+        Posted by
+        <a href="#!">{{ author }}</a>
+        on {{ createdAt | date("MMMM D, YYYY") }}
+    </p>
+</div>
+<!-- Divider-->
+<hr class="my-4" />
+{% endmacro %}
+
+{% block content %}
+
+{% for post in postsData %}
+{{ postPreview(post) }}
+{% endfor %}
+
+<!-- Pager-->
+<div class="d-flex justify-content-end mb-4"><a class="btn btn-primary text-uppercase" href="#!">Older Posts →</a></div>
+{% endblock %}
