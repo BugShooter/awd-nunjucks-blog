@@ -1,12 +1,14 @@
 {
-    "plugins": [
-        "prettier-plugin-jinja-template"
-    ],
+    "tabWidth": 4,
+    "useTabs": false,
+    "semi": false,
+    "singleQuote": true,
+    "trailingComma": "none",
+    "printWidth": 120,
+    "plugins": ["prettier-plugin-jinja-template"],
     "overrides": [
         {
-            "files": [
-                "*.html"
-            ],
+            "files": ["*.html"],
             "options": {
                 "parser": "jinja-template"
             }
