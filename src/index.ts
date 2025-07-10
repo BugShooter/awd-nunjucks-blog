@@ -18,16 +18,23 @@ const posts = rawPosts.map((p: Post, i: number) => {
     }
 })
 
-const app = express();
-const port = process.env.PORT || 3000;
+const app = express()
+const port = process.env.PORT || 3000
 
 // TODO: use cors middleware
 
-nunjucks.configure('src/templates', {
-    autoescape: true,
-    express: app
-})
+nunjucks
+    .configure('src/templates', {
+        autoescape: true,
+        express: app
+    })
     .addFilter('date', nunjucksDateFilter)
+    .addFilter('inArray', function (value, array) {
+        return array.includes(value)
+    })
+    .addFilter('split', function (str, sep) {
+        return str.split(sep)
+    })
 
 app.get('/index.html', (req: Request, res: Response) => {
     res.redirect(301, '/')

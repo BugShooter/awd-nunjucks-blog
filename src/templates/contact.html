@@ -1,112 +1,174 @@
 {% extends "_baseLayout.html" %}
 
 {% block title %}
-Contact
+    Contact
 {% endblock %}
 
 {% block header %}
-<header class="masthead" style="background-image: url('assets/img/contact-bg.jpg')">
-    <div class="container position-relative px-4 px-lg-5">
-        <div class="row gx-4 gx-lg-5 justify-content-center">
-            <div class="col-md-10 col-lg-8 col-xl-7">
-                <div class="page-heading">
-                    <h1>Contact Me</h1>
-                    <span class="subheading">Have questions? I have answers.</span>
+    <header class="masthead" style="background-image: url('assets/img/contact-bg.jpg')">
+        <div class="container position-relative px-4 px-lg-5">
+            <div class="row gx-4 gx-lg-5 justify-content-center">
+                <div class="col-md-10 col-lg-8 col-xl-7">
+                    <div class="page-heading">
+                        <h1>Contact Me</h1>
+                        <span class="subheading">Have questions? I have answers.</span>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-</header>
+    </header>
 {% endblock %}
 
-{% macro formInput(id, label, type="text", placeholder="", validation="required") %}
-<input class="form-control" id="{{ id }}" type="{{type}}" placeholder="{{placeholder}}"
-    data-sb-validations="{{ validation }}" />
-<label for="{{ id }}">{{ label }}</label>
-{% endmacro %}
-
-{% macro formTextarea(id, label, placeholder='', validation="required", style='') %}
-<textarea class="form-control" id="{{ id }}" placeholder="{{ placeholder }}" style="{{ style }}"
-    data-sb-validations="{{ validation }}"></textarea>
-<label for="{{ id }}">{{ label }}</label>
+{% macro styleAttr(styles) %}
+    {% if styles and styles|trim %}style="{{ styles }}"{% endif %}
 {% endmacro %}
 
 {#
-type = name:required | email:required | email:email | phone:required | message:required
+type = text | email | tel| textarea
+validation required | email | ""
 #}
-{% macro invalidFeedback(type, message) %}
-<div class="invalid-feedback" data-sb-feedback="{{ type }}">{{ message }}</div>
+{% macro formControl(params) %}
+    {% set id = params.id %}
+    {% set label = params.label %}
+    {% set type = params.type %}
+    {% set placeholder = params.placeholder | default("") %}
+    {% set validations = params.validations | default(null) %}
+    {% set validations =(validations is string) and (validations| split(',')) or validations %}
+    {% set styles = params.styles %}
+    {% set validationMessages = params.validationMessages %}
+    <div class="form-floating">
+        {% if type | inArray(['text','email','tel']) %}
+            <input
+                class="form-control"
+                id="{{ id }}"
+                type="{{ type }}"
+                placeholder="{{ placeholder }}"
+                {{ styleAttr(styles) }}
+                data-sb-validations="{{ validations }}"
+            />
+        {% elif type == "textarea" %}
+            <textarea
+                class="form-control"
+                id="{{ id }}"
+                placeholder="{{ placeholder }}"
+                {{ styleAttr(styles) }}
+                data-sb-validations="{{ validations }}"
+            ></textarea>
+        {% endif %}
+        <label for="{{ id }}">{{ label }}</label>
+        {% for validation in validations %}
+            {%
+                set defaultValidationMessages = {
+                "required": "A " ~ id ~ " is required",
+                "email": "Email is not valid"
+                }
+            %}
+            {% set message=validationMessages[validation] | default(defaultValidationMessages[validation]) %}
+            <div class="invalid-feedback" data-sb-feedback="{{ id }}:{{ validation }}">{{ message }}</div>
+        {% endfor %}
+    </div>
 {% endmacro %}
 
 {% block content %}
-<main class="mb-4">
-    <div class="container px-4 px-lg-5">
-        <div class="row gx-4 gx-lg-5 justify-content-center">
-            <div class="col-md-10 col-lg-8 col-xl-7">
-                <p>Want to get in touch? Fill out the form below to send me a message and I will get back to you as soon
-                    as possible!</p>
-                <div class="my-5">
-                    <!-- * * * * * * * * * * * * * * *-->
-                    <!-- * * SB Forms Contact Form * *-->
-                    <!-- * * * * * * * * * * * * * * *-->
-                    <!-- This form is pre-integrated with SB Forms.-->
-                    <!-- To make this form functional, sign up at-->
-                    <!-- https://startbootstrap.com/solution/contact-forms-->
-                    <!-- to get an API token!-->
-                    <form id="contactForm" data-sb-form-api-token="API_TOKEN">
-                        <div class="form-floating">
-                            {{ formInput("name", "Name", "text", "Enter your name...", "required") }}
-                            {{ invalidFeedback("name:required", "A name is required.") }}
-                        </div>
-                        <div class="form-floating">
-                            {{ formInput("email", "Email address", "email", "Enter your email...", "required,email") }}
-                            {{ invalidFeedback("email:required", "An email is required.") }}
-                            {{ invalidFeedback("email:email", "Email is not valid.") }}
-                        </div>
-                        <div class="form-floating">
-                            {{ formInput("phone", "Phone Number", "tel", "Enter your phone number...", "required") }}
-                            {{ invalidFeedback("phone:required", "A phone number is required.") }}
-                        </div>
-                        <div class="form-floating">
-                            {{ formTextarea("message", "Message", "Enter your message here...", "required", "height: 12rem") }}
-                            {{ invalidFeedback("message:required", "A message is required.") }}
-                        </div>
-                        <br />
-                        <!-- Submit success message-->
-                        <!---->
-                        <!-- This is what your users will see when the form-->
-                        <!-- has successfully submitted-->
-                        <div class="d-none" id="submitSuccessMessage">
-                            <div class="text-center mb-3">
-                                <div class="fw-bolder">Form submission successful!</div>
-                                To activate this form, sign up at
-                                <br />
-                                <a
-                                    href="https://startbootstrap.com/solution/contact-forms">https://startbootstrap.com/solution/contact-forms</a>
+    <main class="mb-4">
+        <div class="container px-4 px-lg-5">
+            <div class="row gx-4 gx-lg-5 justify-content-center">
+                <div class="col-md-10 col-lg-8 col-xl-7">
+                    <p>
+                        Want to get in touch? Fill out the form below to send me a message and I will get back to you as
+                        soon as possible!
+                    </p>
+                    <div class="my-5">
+                        <!-- * * * * * * * * * * * * * * *-->
+                        <!-- * * SB Forms Contact Form * *-->
+                        <!-- * * * * * * * * * * * * * * *-->
+                        <!-- This form is pre-integrated with SB Forms.-->
+                        <!-- To make this form functional, sign up at-->
+                        <!-- https://startbootstrap.com/solution/contact-forms-->
+                        <!-- to get an API token!-->
+                        <form id="contactForm" data-sb-form-api-token="API_TOKEN">
+                            {{
+                                formControl({
+                                id: "name",
+                                label: "Name",
+                                type: "text",
+                                placeholder: "Enter your name...",
+                                validations: "required"
+                                })
+                            }}
+                            {{
+                                formControl({
+                                id: "email",
+                                label: "Email address",
+                                type: "email",
+                                placeholder: "Enter your email...",
+                                validations: "required,email",
+                                validationMessages: {
+                                required: "An email is required."
+                                }
+                                })
+                            }}
+                            {{
+                                formControl({
+                                id: "phone",
+                                label: "Phone Number",
+                                type: "tel",
+                                placeholder: "Enter your phone number...",
+                                validations: "required",
+                                validationMessages: {
+                                required: "A phone number is required."
+                                }
+                                })
+                            }}
+                            {{
+                                formControl({
+                                id: "message",
+                                label: "Message",
+                                type: "textarea",
+                                placeholder: "Enter your message here...",
+                                validations: "required",
+                                styles: "height: 12rem"
+                                })
+                            }}
+
+                            <br />
+                            <!-- Submit success message-->
+                            <!---->
+                            <!-- This is what your users will see when the form-->
+                            <!-- has successfully submitted-->
+                            <div class="d-none" id="submitSuccessMessage">
+                                <div class="text-center mb-3">
+                                    <div class="fw-bolder">Form submission successful!</div>
+                                    To activate this form, sign up at
+                                    <br />
+                                    <a href="https://startbootstrap.com/solution/contact-forms"
+                                        >https://startbootstrap.com/solution/contact-forms</a
+                                    >
+                                </div>
                             </div>
-                        </div>
-                        <!-- Submit error message-->
-                        <!---->
-                        <!-- This is what your users will see when there is-->
-                        <!-- an error submitting the form-->
-                        <div class="d-none" id="submitErrorMessage">
-                            <div class="text-center text-danger mb-3">Error sending message!</div>
-                        </div>
-                        <!-- Submit Button-->
-                        <button class="btn btn-primary text-uppercase disabled" id="submitButton"
-                            type="submit">Send</button>
-                    </form>
+                            <!-- Submit error message-->
+                            <!---->
+                            <!-- This is what your users will see when there is-->
+                            <!-- an error submitting the form-->
+                            <div class="d-none" id="submitErrorMessage">
+                                <div class="text-center text-danger mb-3">Error sending message!</div>
+                            </div>
+                            <!-- Submit Button-->
+                            <button class="btn btn-primary text-uppercase disabled" id="submitButton" type="submit">
+                                Send
+                            </button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-</main>
+    </main>
 {% endblock %}
 
 {% block script %}
-<!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *-->
-<!-- * *                               SB Forms JS                               * *-->
-<!-- * * Activate your form at https://startbootstrap.com/solution/contact-forms * *-->
-<!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *-->
-<script src="https://cdn.startbootstrap.com/sb-forms-latest.js"></script>
+    <!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *-->
+    <!-- * *                               SB Forms JS                               * *-->
+    <!-- * * Activate your form at https://startbootstrap.com/solution/contact-forms * *-->
+    <!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *-->
+    <script src="https://cdn.startbootstrap.com/sb-forms-latest.js"></script>
 {% endblock %}
