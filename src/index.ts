@@ -51,6 +51,13 @@ app.get('/post/:postId', (req: Request, res: Response) => {
     }
 })
 
+app.get('/contact.html', (req: Request, res: Response) => {
+    res.redirect(301, '/contact')
+})
+app.get('/contact', (req: Request, res: Response) => {
+    res.render('contact.html')
+})
+
 app.use(express.static('src/public'))
 
 app.listen(port, () => {
