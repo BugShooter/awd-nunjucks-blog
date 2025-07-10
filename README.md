@@ -275,3 +275,12 @@ If you have a `types/global.d.ts` file and `ts-node` is not recognizing it, you 
 This tells `ts-node` to include all files in the project, including type definition files. 
 
 Why ts-node doesn't see the `types/global.d.ts` file by default is because it only includes files that are explicitly referenced in the project or files that are part of the compilation process. By setting `files: true`, you ensure that all files, including type definitions, are included.
+
+### Fixing Prettier Problems
+The Prettier configuration can be added to your project by creating a `.prettierrc` file in the root directory of your project. This file allows you to specify various formatting options for your code.
+
+To check what configuration files are used by Prettier, you can run the following command:
+```bash
+npx prettier --find-config-path package.json
+```
+It is important to specify the path to a specific file and not a directory, otherwise Prettier will not be able to find the configuration.
