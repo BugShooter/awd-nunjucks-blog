@@ -2,9 +2,10 @@
   "name": "nunjucks-blog-app",
   "version": "1.0.0",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "build": "tsc",
-    "dev": "nodemon src/index.ts",
+    "dev": "nodemon --exec \"node --import ./register.mjs\" src/index.ts",
     "watch": "tsc --watch",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
