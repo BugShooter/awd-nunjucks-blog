@@ -1,9 +1,22 @@
 import express from 'express'
 import nunjucks from 'nunjucks'
-// const nunjucksDateFilter = require('nunjucks-date-filter');
+import fs from 'fs'
+import path from 'path'
 import nunjucksDateFilter from 'nunjucks-date-filter'
-import type { Request, Response } from 'express'
-import postsData from './data/posts.json'
+import type { NextFunction, Request, Response } from 'express'
+// import rawPosts from './data/posts.json'
+import slug from 'slug'
+
+const rawPosts: Post[] = JSON.parse(
+    fs.readFileSync(path.join(import.meta.dirname, 'data/posts.json'), 'utf-8')
+);
+const posts = rawPosts.map((p: Post, i: number) => {
+    return {
+        ...p,
+        slug: slug(p.title),
+        id: String(i + 1)
+    }
+})
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -16,10 +29,26 @@ nunjucks.configure('src/templates', {
 })
     .addFilter('date', nunjucksDateFilter)
 
+app.get('/index.html', (req: Request, res: Response) => {
+    res.redirect(301, '/')
+})
 app.get('/', (req: Request, res: Response) => {
     res.render('index.html', {
-        postsData
+        posts
     })
+})
+
+app.get('/post/:postId', (req: Request, res: Response) => {
+    const postId = req.params.postId;
+    let post = posts.find((p: Post) => p.slug === postId);
+    if (!post) post = posts.find((p: Post) => p.id == postId);
+    if (!post) {
+        res.sendStatus(404)
+    } else {
+        res.render('post.html', {
+            post
+        })
+    }
 })
 
 app.use(express.static('src/public'))
