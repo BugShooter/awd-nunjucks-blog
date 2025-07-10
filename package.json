@@ -1,36 +1,36 @@
 {
-  "name": "nunjucks-blog-app",
-  "version": "1.0.0",
-  "main": "index.js",
-  "type": "module",
-  "scripts": {
-    "build": "tsc",
-    "dev": "nodemon --exec \"node --import ./register.mjs\" src/index.ts",
-    "watch": "tsc --watch",
-    "format": "prettier --write .",
-    "format:check": "prettier --check .",
-    "start": "node dist/index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
-  "dependencies": {
-    "dotenv": "^17.2.0",
-    "express": "^5.1.0",
-    "nunjucks": "^3.2.4",
-    "slug": "^11.0.0"
-  },
-  "devDependencies": {
-    "@types/express": "^5.0.3",
-    "@types/node": "^24.0.12",
-    "@types/nunjucks": "^3.2.6",
-    "@types/slug": "^5.0.9",
-    "nodemon": "^3.1.10",
-    "nunjucks-date-filter": "^0.1.1",
-    "prettier": "^3.6.2",
-    "prettier-plugin-jinja-template": "^2.1.0",
-    "ts-node": "^10.9.2"
-  }
+    "name": "nunjucks-blog-app",
+    "version": "1.0.0",
+    "main": "index.js",
+    "type": "module",
+    "scripts": {
+        "build": "tsc",
+        "dev": "nodemon --exec \"node --import ./register.mjs\" src/index.ts",
+        "watch": "tsc --watch",
+        "format": "prettier --write .",
+        "format:check": "prettier --check .",
+        "start": "node dist/index.js",
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "description": "",
+    "dependencies": {
+        "dotenv": "^17.2.0",
+        "express": "^5.1.0",
+        "nunjucks": "^3.2.4",
+        "slug": "^11.0.0"
+    },
+    "devDependencies": {
+        "@types/express": "^5.0.3",
+        "@types/node": "^24.0.12",
+        "@types/nunjucks": "^3.2.6",
+        "@types/slug": "^5.0.9",
+        "nodemon": "^3.1.10",
+        "nunjucks-date-filter": "^0.1.1",
+        "prettier": "^3.6.2",
+        "prettier-plugin-jinja-template": "^2.1.0",
+        "ts-node": "^10.9.2"
+    }
 }

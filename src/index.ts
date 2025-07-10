@@ -7,9 +7,7 @@ import type { NextFunction, Request, Response } from 'express'
 // import rawPosts from './data/posts.json'
 import slug from 'slug'
 
-const rawPosts: Post[] = JSON.parse(
-    fs.readFileSync(path.join(import.meta.dirname, 'data/posts.json'), 'utf-8')
-);
+const rawPosts: Post[] = JSON.parse(fs.readFileSync(path.join(import.meta.dirname, 'data/posts.json'), 'utf-8'))
 const posts = rawPosts.map((p: Post, i: number) => {
     return {
         ...p,
@@ -46,9 +44,9 @@ app.get('/', (req: Request, res: Response) => {
 })
 
 app.get('/post/:postId', (req: Request, res: Response) => {
-    const postId = req.params.postId;
-    let post = posts.find((p: Post) => p.slug === postId);
-    if (!post) post = posts.find((p: Post) => p.id == postId);
+    const postId = req.params.postId
+    let post = posts.find((p: Post) => p.slug === postId)
+    if (!post) post = posts.find((p: Post) => p.id == postId)
     if (!post) {
         res.sendStatus(404)
     } else {
@@ -71,5 +69,5 @@ app.listen(port, () => {
     console.log(`Express blog application powered by nunjucks listening on port ${port}`)
 }).on('error', (e) => {
     console.error(e.message)
-    process.exit(1);
+    process.exit(1)
 })
