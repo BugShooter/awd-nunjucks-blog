@@ -8,13 +8,7 @@ type Middleware = (req: Request, res: Response, next: NextFunction) => void
 
 let post: Post | undefined = undefined
 
-adminRouter.use((req, res, next) => {
-    console.log(req.method, req.path, req.method);
-    next();
-});
-
 const findPostByParamMiddleware: Middleware = (req, res, next) => {
-    console.log(req.path, req.params)
     const postId = req.params.postId
     post = posts.find((p: Post) => p.slug === postId)
     if (!post) post = posts.find((p: Post) => p.id == postId)
