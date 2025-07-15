@@ -17,7 +17,10 @@ blogRouter.get('/post/:postId', (req: Request, res: Response) => {
     let post = posts.find((p: Post) => p.slug === postId)
     if (!post) post = posts.find((p: Post) => p.id == postId)
     if (!post) {
-        res.sendStatus(404)
+        res.status(404).render('error.html', {
+            title: 'Error: 404',
+            content: 'Post not found'
+        })
     } else {
         res.render('post.html', {
             post

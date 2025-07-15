@@ -1,0 +1,68 @@
+{% extends "admin/layout.html" %}
+
+{% block title %}
+Clean Blog (Admin Dashboard)
+{% endblock %}
+
+{% block header %}
+<header class="masthead" style="background-image: url('assets/img/home-bg.jpg')">
+    <div class="container position-relative px-4 px-lg-5">
+        <div class="row gx-4 gx-lg-5 justify-content-center">
+            <div class="col-md-10 col-lg-8 col-xl-7">
+                <div class="site-heading">
+                    <h1>Dashboard</h1>
+                    <span class="subheading">Admin Panel for Blog Management</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+{% endblock %}
+
+{% macro postPreview(post) %}
+{% set id = post.slug | default(post.id) %}
+{% set title = post.title %}
+{% set teaser = post.teaser %}
+{% set author = post.author %}
+{% set createdAt = post.createdAt %}
+<!-- Post preview-->
+<div class="post-preview-container">
+    <div class="post-preview">
+        <a href="{{ 'post/' ~ id }}">
+            <h2 class="post-title">{{ title }}</h2>
+            <h3 class="post-subtitle">{{ teaser }}</h3>
+        </a>
+        <p class="post-meta">
+            Posted by
+            <a href="#!">{{ author }}</a>
+            on {{ createdAt | date("MMMM D, YYYY") }}
+        </p>
+    </div>
+    <div class="post-actions">
+        <div class="text-end mt-3">
+        {# <a class="btn btn-primary btn-sm" href="{{ 'post/' ~ id }}">View →</a> #}
+        <a class="btn btn-secondary btn-sm" href="{{ 'admin/post/' ~ id ~ '/edit' }}">Edit</a>
+        <form action="{{ 'admin/post/' ~ id ~ '/delete' }}" method="post" style="display:inline;">
+            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+        </form>
+    </div>
+</div>
+<!-- Divider-->
+<hr class="my-4" />
+{% endmacro %}
+
+{% block content %}
+<div class="container px-4 px-lg-5">
+    <div class="row gx-4 gx-lg-5 justify-content-center">
+        <div class="col-md-10 col-lg-8 col-xl-7">
+            {% for post in posts %}
+            {{ postPreview(post) }}
+            {% endfor %}
+            <!-- Pager-->
+            <div class="d-flex justify-content-end mb-4">
+                <a class="btn btn-primary text-uppercase" href="#!">Older Posts →</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

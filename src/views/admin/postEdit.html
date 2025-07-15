@@ -1,0 +1,58 @@
+{% extends "admin/layout.html" %}
+
+{% block title %}Edit Post{% endblock %}
+
+{% block header %}
+    <header class="masthead" style="background-image: url('assets/img/{{ post.image }}')">
+        <div class="container position-relative px-4 px-lg-5">
+            <div class="row gx-4 gx-lg-5 justify-content-center">
+                <div class="col-md-10 col-lg-8 col-xl-7">
+                    <div class="post-heading">
+                        <h1>{{ post.title }}</h1>
+                        <h2 class="subheading">{{ post.teaser }}</h2>
+                        <span class="meta">
+                            Posted by
+                            <a href="#!">{{ post.author }}</a>
+                            on {{ post.createdAt | date("MMMM DD, YYYY") }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+{% endblock %}
+
+{% block content %}
+    <!-- Post Content-->
+    <article class="mb-4">
+        <div class="container px-4 px-lg-5">
+            {# <div class="row gx-4 gx-lg-5 justify-content-center">
+                <div class="col-md-10 col-lg-8 col-xl-7">{{ post.content | safe }}</div>
+            </div> #}
+            <div class="row gx-4 gx-lg-5 justify-content-center">
+                <div class="col-md-10 col-lg-8 col-xl-7">
+                    <form action="{{ 'admin/post/' ~ post.slug }}" method="post">
+                        <input type="hidden" name="_method" value="PUT">
+                        <div class="form-group">
+                            <label for="title">Title</label>
+                            <input type="text" class="form-control" id="title" name="title" value="{{ post.title }}" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="teaser">Teaser</label>
+                            <input type="text" class="form-control" id="teaser" name="teaser" value="{{ post.teaser }}" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="content">Content</label>
+                            <textarea class="form-control" id="content" name="content" rows="5" required>{{ post.content }}</textarea>
+                        </div>
+                        {# place button to right and make gap from top #}
+                        <div class="text-end mt-3">
+                            <button type="submit" class="btn btn-primary">Update Post</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </article>
+    
+{% endblock %}
