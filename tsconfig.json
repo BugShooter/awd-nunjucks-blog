@@ -3,12 +3,12 @@
         "rootDir": "./src",
         "outDir": "./dist",
         "target": "ES2020",
-        "module": "ESNEXT",
+        "module": "nodenext",
         "strict": true,
         "esModuleInterop": true,
         "skipLibCheck": true,
         "forceConsistentCasingInFileNames": true,
-        "moduleResolution": "node",
+        "moduleResolution": "nodenext",
         "resolveJsonModule": true
     },
     "ts-node": {
