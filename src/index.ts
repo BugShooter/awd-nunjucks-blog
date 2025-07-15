@@ -22,7 +22,7 @@ const port = process.env.PORT || 3000
 // TODO: use cors middleware
 
 nunjucks
-    .configure('src/templates', {
+    .configure('src/views', {
         autoescape: true,
         express: app
     })
