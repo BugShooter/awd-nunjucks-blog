@@ -63,12 +63,17 @@ This command installs:
         "rootDir": "./src",
         "outDir": "./dist",
         "target": "ES2020",
-        "module": "commonjs",
+        "module": "nodenext",
         "strict": true,
         "esModuleInterop": true,
         "skipLibCheck": true,
         "forceConsistentCasingInFileNames": true,
+        "moduleResolution": "nodenext",
         "resolveJsonModule": true
+    },
+    "ts-node": {
+        "esm": true,
+        "files": true
     }
 }
 ```
@@ -82,6 +87,10 @@ This configuration file for TypeScript specifies:
 - `skipLibCheck` skips type checking of declaration files.
 - `forceConsistentCasingInFileNames` ensures that file names are case-sensitive.
 - `resolveJsonModule` allows importing JSON files as modules.
+- `moduleResolution` specifies how modules are resolved.
+- `rootDir` specifies the root directory of the source files.
+- `outDir` specifies the output directory for compiled JavaScript files.
+- `ts-node` options specify that ESM modules should be used and that all files should be included.
 
 6. Create a `nodemon.json` file for development:
 
@@ -325,3 +334,48 @@ npx prettier --find-config-path package.json
 ```
 
 It is important to specify the path to a specific file and not a directory, otherwise Prettier will not be able to find the configuration.
+
+### Sending form with a PUT method and processing it in Express
+To send a form with a PUT method and process it in Express, you can use the following steps:
+
+1. In your HTML form, set the method to `post` and include a hidden input field with the name `_method` and value `PUT`:
+
+```html
+<form action="/admin/post/{{ post.slug }}" method="post">
+    <input type="hidden" name="_method" value="PUT">
+    <!-- other form fields -->
+</form>
+```
+
+2. In your Express route handler, check for the `_method` field and handle the request accordingly:
+
+```javascript
+app.post('/admin/post/:slug', (req, res) => {
+    if (req.body._method === 'PUT') {
+        // Handle the PUT request
+    } else {
+        // Handle other request methods
+    }
+});
+```
+
+you can use method-override middleware to handle the PUT method in Express. This middleware allows you to use HTTP verbs such as PUT or DELETE in places where the client doesn't support it.
+But this middleware don't look for a hidden input field in the form, it looks for a query parameter or a header to determine the method override.
+
+### Using method-override middleware package
+To use the `method-override` middleware in your Express application, you need to install it first:
+
+```bash
+npm install method-override
+npm install @types/method-override --save-dev
+```
+
+```javascript
+import methodOverride from 'method-override';
+
+// This will look for a query parameter named `_method` or a header named `X-HTTP-Method-Override`
+app.use(methodOverride('_method'));
+app.put('/admin/post/:slug', (req, res) => {
+    // Handle the PUT request
+});
+```
