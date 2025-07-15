@@ -1,0 +1,33 @@
+import express from "express"
+import type { Router, Request, Response, NextFunction } from "express"
+import { posts } from "../models/postModel.js";
+
+export const blogRouter: Router = express.Router();
+blogRouter.get('/index.html', (req: Request, res: Response) => {
+    res.redirect(301, '/')
+})
+blogRouter.get('/', (req: Request, res: Response) => {
+    res.render('index.html', {
+        posts
+    })
+})
+
+blogRouter.get('/post/:postId', (req: Request, res: Response) => {
+    const postId = req.params.postId
+    let post = posts.find((p: Post) => p.slug === postId)
+    if (!post) post = posts.find((p: Post) => p.id == postId)
+    if (!post) {
+        res.sendStatus(404)
+    } else {
+        res.render('post.html', {
+            post
+        })
+    }
+})
+
+blogRouter.get('/contact.html', (req: Request, res: Response) => {
+    res.redirect(301, '/contact')
+})
+blogRouter.get('/contact', (req: Request, res: Response) => {
+    res.render('contact.html')
+})
