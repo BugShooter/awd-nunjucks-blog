@@ -6,6 +6,20 @@ export const adminRouter: Router = express.Router();
 
 type Middleware = (req: Request, res: Response, next: NextFunction) => void
 
+const log = (...data: any) => {
+    const message = [
+        'ADMIN:',
+        new Date().toISOString(),
+    ].join(' ')
+    console.log(message, ...data)
+}
+const requestLoggerMiddleware: Middleware = (req, res, next) => {
+    log(req.method, req.path)
+    next()
+}
+adminRouter.use(requestLoggerMiddleware)
+
+
 let post: Post | undefined = undefined
 
 const findPostByParamMiddleware: Middleware = (req, res, next) => {
@@ -32,21 +46,20 @@ adminRouter.get('/post/create', (req: Request, res: Response) => {
     const post: Post = {
         title: '',
         content: '',
-        date: new Date().getTime().toString()
+        createdAt: new Date().getTime().toString()
     }
-    //TODO: create admin/postCreate.html file with create form
-    // with post on /post
-    res.render('admin/postEdit.html', {
+    res.render('admin/postCreate.html', {
         post
     })
 })
 adminRouter.post('/post', async (req: Request, res: Response) => {
-    // TODO: validate req.body
+    // TODO: validate and sanitize req.body
     const postDraft = {
-        slug: req.body.slug,
-        title: req.body.title,
-        content: req.body.content,
-        date: req.body.date,
+        slug: req.body.slug ?? '',
+        title: req.body.title ?? '',
+        teaser: req.body.teaser ?? '',
+        content: req.body.content ?? '',
+        createdAt: new Date().getTime().toString(),
     }
     post = await createPost(postDraft)
     res.redirect(`/admin/post/${post.slug ? post.slug : post.id}`)
@@ -66,13 +79,15 @@ adminRouter.get('/post/:postId/edit', findPostByParamMiddleware, (req: Request, 
 adminRouter.put('/post/:postId', findPostByParamMiddleware, async (req: Request, res: Response) => {
     if (!post) throw new Error('Unpossible case')
     // TODO: validate fields and transform if necessary
+    // safe fields
     if ('slug' in req.body) post.slug = req.body.slug
     if ('title' in req.body) post.title = req.body.title
+    if ('teaser' in req.body) post.teaser = req.body.teaser
     if ('content' in req.body) post.content = req.body.content
-    if ('date' in req.body) post.date = req.body.date
+    // unsafe fields
+    // if ('createdAt' in req.body) post.createdAt = req.body.createdAt
 
     await updatePost(post)
-    console.log(`Redirect: ${post.slug ? post.slug : post.id}`)
     res.redirect(`${post.slug ? post.slug : post.id}`)
 })
 

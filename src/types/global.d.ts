@@ -7,6 +7,9 @@ interface Post {
     id?: string
     slug?: string
     title: string
+    teaser?: string
     content: string
-    date: string
+    image?: string
+    author?: string
+    createdAt: string
 }
