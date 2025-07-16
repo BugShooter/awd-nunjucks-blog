@@ -4,7 +4,8 @@
     "main": "index.js",
     "type": "module",
     "scripts": {
-        "build": "tsc && cp -r src/data dist/",
+        "copy:orig": "bash -c 'for f in src/data/*.orig.json; do cp \"$f\" \"${f/orig.json/json}\"; done' && echo 'Copied orig files to json' && cp -r src/data dist/",
+        "build": "tsc && npm run copy:orig",
         "clean": "rm -rf dist",
         "dev": "nodemon --exec \"node --import ./register.mjs\" src/index.ts",
         "watch": "tsc --watch",
