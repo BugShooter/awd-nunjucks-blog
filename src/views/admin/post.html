@@ -23,7 +23,7 @@
 {% endblock %}
 
 {% block content %}
-{% set id = post.slug | default(post.id) %}
+{% set id = post.slug or post.id %}
 <!-- Post Content-->
 <article class="mb-4">
     <div class="container px-4 px-lg-5">
@@ -33,7 +33,8 @@
                 <div class="text-end mt-3">
                     {# <a class="btn btn-primary btn-sm" href="{{ 'post/' ~ id }}">View →</a> #}
                     <a class="btn btn-secondary btn-sm" href="{{ 'admin/post/' ~ id ~ '/edit' }}">Edit</a>
-                    <form action="{{ 'admin/post/' ~ id ~ '/delete' }}" method="post" style="display:inline;">
+                    <form action="{{ 'admin/post/' ~ id }}" method="post" style="display:inline;">
+                        <input type="hidden" name="_method" value="DELETE">
                         <button type="submit" class="btn btn-danger btn-sm">Delete</button>
                     </form>
                 </div>

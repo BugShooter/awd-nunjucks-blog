@@ -19,7 +19,9 @@
     </header>
 {% endblock %}
 
-{% macro postPreview(post, url= "post.html") %}
+{% macro postPreview(post) %}
+    {% set id = post.slug or post.id %}
+    {% set url = 'post/' ~ id %}
     {% set title = post.title %}
     {% set teaser = post.teaser %}
     {% set author = post.author %}
@@ -45,11 +47,7 @@
         <div class="row gx-4 gx-lg-5 justify-content-center">
             <div class="col-md-10 col-lg-8 col-xl-7">
                 {% for post in posts %}
-                    {% if (post.slug) %}
-                        {{ postPreview(post, 'post/' ~ post.slug) }}
-                    {% else %}
-                        {{ postPreview(post, 'post/' ~ loop.index) }}
-                    {% endif %}
+                    {{ postPreview(post) }}
                 {% endfor %}
                 <!-- Pager-->
                 <div class="d-flex justify-content-end mb-4">

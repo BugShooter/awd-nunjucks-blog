@@ -20,7 +20,7 @@ Clean Blog (Admin Dashboard)
 {% endblock %}
 
 {% macro postPreview(post) %}
-{% set id = post.slug | default(post.id) %}
+{% set id = post.slug or post.id %}
 {% set title = post.title %}
 {% set teaser = post.teaser %}
 {% set author = post.author %}
@@ -40,11 +40,14 @@ Clean Blog (Admin Dashboard)
     </div>
     <div class="post-actions">
         <div class="text-end mt-3">
-        {# <a class="btn btn-primary btn-sm" href="{{ 'post/' ~ id }}">View →</a> #}
-        <a class="btn btn-secondary btn-sm" href="{{ 'admin/post/' ~ id ~ '/edit' }}">Edit</a>
-        <form action="{{ 'admin/post/' ~ id ~ '/delete' }}" method="post" style="display:inline;">
-            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
-        </form>
+            <a class="btn btn-primary btn-sm" href="{{ 'post/' ~ id }}" target="_blank">View as user →</a>
+            <a class="btn btn-primary btn-sm" href="{{ 'admin/post/' ~ id }}">View →</a>
+            <a class="btn btn-secondary btn-sm" href="{{ 'admin/post/' ~ id ~ '/edit' }}">Edit</a>
+            <form action="{{ 'admin/post/' ~ id }}" method="post" style="display:inline;">
+                <input type="hidden" name="_method" value="DELETE">
+                <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+            </form>
+        </div>
     </div>
 </div>
 <!-- Divider-->
@@ -59,8 +62,14 @@ Clean Blog (Admin Dashboard)
             {{ postPreview(post) }}
             {% endfor %}
             <!-- Pager-->
+             {% if posts|length == 0 %}
             <div class="d-flex justify-content-end mb-4">
                 <a class="btn btn-primary text-uppercase" href="#!">Older Posts →</a>
+            </div>
+            {% endif %}
+            <!-- Button to create a new post -->
+            <div class="text-end mt-3 mb-4">
+                <a class="btn btn-success" href="{{ 'admin/post/create' }}">Create New Post</a>
             </div>
         </div>
     </div>
