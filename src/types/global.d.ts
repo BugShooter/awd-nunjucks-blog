@@ -11,5 +11,5 @@ interface Post {
     content: string
     image?: string
     author?: string
-    createdAt: string
+    createdAt: number
 }

@@ -46,7 +46,7 @@ adminRouter.get('/post/create', (req: Request, res: Response) => {
     const post: Post = {
         title: '',
         content: '',
-        createdAt: new Date().getTime().toString()
+        createdAt: new Date().getTime()
     }
     res.render('admin/postCreate.html', {
         post
@@ -54,12 +54,12 @@ adminRouter.get('/post/create', (req: Request, res: Response) => {
 })
 adminRouter.post('/post', async (req: Request, res: Response) => {
     // TODO: validate and sanitize req.body
-    const postDraft = {
+    const postDraft: Omit<Post, 'id'> = {
         slug: req.body.slug ?? '',
         title: req.body.title ?? '',
         teaser: req.body.teaser ?? '',
         content: req.body.content ?? '',
-        createdAt: new Date().getTime().toString(),
+        createdAt: Math.floor(Date.now() / 1000),
     }
     post = await createPost(postDraft)
     res.redirect(`/admin/post/${post.slug ? post.slug : post.id}`)
