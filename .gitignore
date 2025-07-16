@@ -2,6 +2,8 @@
 # Ignore node modules and build artifacts
 node_modules
 dist
+src/data/*.json
+!src/data/*.orig.json
 
 # Ignore logs and zip files
 *.log
