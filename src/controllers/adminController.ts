@@ -1,6 +1,8 @@
 import express from "express"
 import type { Router, Request, Response, NextFunction } from "express"
 import { createPost, deletePost, posts, updatePost } from "../models/postModel.js";
+import sanitizeHtml from 'sanitize-html'
+import slug from "slug";
 
 export const adminRouter: Router = express.Router();
 
@@ -52,8 +54,44 @@ adminRouter.get('/post/create', (req: Request, res: Response) => {
         post
     })
 })
+function sanitizePost<T extends (Post | Omit<Post, 'id'>)>(post: T): T {
+    const htmlConfig = {
+        allowedTags: [
+            'span', 'div', 'p',
+            'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+            'ul', 'ol', 'li',
+            'b', 'i', 'u', 'em', 'strong',
+            'br', 'hr',
+            'a', 'img',
+            'blockquote', 'pre', 'code',
+        ],
+        allowedAttributes: {
+            a: ['href', 'name', 'target', 'rel'],
+            img: ['src', 'alt', 'title', 'width', 'height'],
+            '*': ['style']
+        },
+        allowedSchemes: ['http', 'https', 'mailto', 'data'],
+        allowedSchemesByTag: {
+            img: ['http', 'https', 'data']
+        },
+        allowProtocolRelative: true
+    }
+    const textConfig = {
+        allowedTags: [],
+    }
+
+    // (['slug','title','teaser'] as Array<keyof Post>).forEach(field => {
+    //     if (post[field]) post[field] = sanitizeHtml(post[field], textConfig)
+    // });
+    if (post.slug) post.slug = sanitizeHtml(post.slug, textConfig)
+    if (post.title) post.title = sanitizeHtml(post.title, textConfig)
+    if (post.teaser) post.teaser = sanitizeHtml(post.teaser, textConfig)
+    post.content = sanitizeHtml(post.content, htmlConfig)
+
+    return post;
+}
 adminRouter.post('/post', async (req: Request, res: Response) => {
-    // TODO: validate and sanitize req.body
+    // TODO: validate req.body
     const postDraft: Omit<Post, 'id'> = {
         slug: req.body.slug ?? '',
         title: req.body.title ?? '',
@@ -61,7 +99,8 @@ adminRouter.post('/post', async (req: Request, res: Response) => {
         content: req.body.content ?? '',
         createdAt: Math.floor(Date.now() / 1000),
     }
-    post = await createPost(postDraft)
+    const sanitizedPostDraft = sanitizePost(postDraft)
+    post = await createPost(sanitizedPostDraft)
     res.redirect(`/admin/post/${post.slug ? post.slug : post.id}`)
 })
 

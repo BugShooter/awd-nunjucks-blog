@@ -379,3 +379,56 @@ app.put('/admin/post/:slug', (req, res) => {
     // Handle the PUT request
 });
 ```
+
+### Sanitizing User Input 
+When accepting user input, especially if it includes HTML, it's crucial to sanitize it to prevent XSS (Cross-Site Scripting) attacks.
+In this project we use nunjucks for templating, which automatically escapes variables by default. However, if you need to allow certain HTML tags or attributes, you should sanitize the input before rendering it.
+
+#### Sanitizing using `sanitize-html`
+To sanitize user input, you can use the `sanitize-html` package. Install it with:
+
+```bash
+npm install sanitize-html
+npm i --save-dev @types/sanitize-html
+```
+
+Then, you can use it in your application like this:
+
+```typescript
+import sanitizeHtml from 'sanitize-html'
+
+const clean = sanitizeHtml(dirty, {
+    allowedTags: [],
+    allowedAttributes: {}
+})
+```
+This will remove all HTML tags and attributes from the input, ensuring that only plain text is stored.
+
+### Sanitizing using `he`
+To encode and decode HTML entities, you can use the `he` package. Install it with:
+
+```bash
+npm install he
+```
+Because `he` is a CommonJS module, you need to declare it in your TypeScript types to use in ES modules.
+Create a file `src/types/global.d.ts` and add the following:
+
+```typescript
+declare module 'he' {
+    export function escape(text: string): string;
+    export function unescape(text: string): string;
+    export function encode(text: string, options?: any): string;
+    export function decode(text: string, options?: any): string;
+}
+```
+
+Then, you can use it in your application like this:
+
+```typescript
+import { encode, decode } from 'he'
+
+const encoded = encode(dirty)
+const decoded = decode(encoded)
+```
+This will encode HTML entities in the input, making it safe to store and display.
+
