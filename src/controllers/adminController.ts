@@ -1,8 +1,8 @@
 import express from "express"
 import type { Router, Request, Response, NextFunction } from "express"
-import { createPost, deletePost, posts, updatePost } from "../models/postModel.js";
+import { createPost, deletePost, getAllPosts, updatePost } from "../models/postModel.js";
 import sanitizeHtml from 'sanitize-html'
-import slug from "slug";
+import errorHandlerMiddleware from "../middlewares/errorHandlerMiddleware.js";
 
 export const adminRouter: Router = express.Router();
 
@@ -21,11 +21,11 @@ const requestLoggerMiddleware: Middleware = (req, res, next) => {
 }
 adminRouter.use(requestLoggerMiddleware)
 
-
 let post: Post | undefined = undefined
 
-const findPostByParamMiddleware: Middleware = (req, res, next) => {
+const findPostByParamMiddleware: Middleware = async (req, res, next) => {
     const postId = req.params.postId
+    const posts = await getAllPosts()
     post = posts.find((p: Post) => p.slug === postId)
     if (!post) post = posts.find((p: Post) => p.id == postId)
     if (!post) {
@@ -38,7 +38,8 @@ const findPostByParamMiddleware: Middleware = (req, res, next) => {
     }
 }
 
-adminRouter.get('/', (req: Request, res: Response) => {
+adminRouter.get('/', async (req: Request, res: Response) => {
+    const posts = await getAllPosts()
     res.render('admin/index.html', {
         posts
     })
@@ -48,7 +49,7 @@ adminRouter.get('/post/create', (req: Request, res: Response) => {
     const post: Post = {
         title: '',
         content: '',
-        createdAt: new Date().getTime()
+        createdAt: Math.floor(Date.now() / 1000)
     }
     res.render('admin/postCreate.html', {
         post
@@ -115,7 +116,7 @@ adminRouter.get('/post/:postId/edit', findPostByParamMiddleware, (req: Request, 
         post
     })
 })
-adminRouter.put('/post/:postId', findPostByParamMiddleware, async (req: Request, res: Response) => {
+adminRouter.put('/post/:postId', findPostByParamMiddleware, async (req: Request, res: Response, next: NextFunction) => {
     if (!post) throw new Error('Unpossible case')
     // TODO: validate fields and transform if necessary
     // safe fields
@@ -126,7 +127,11 @@ adminRouter.put('/post/:postId', findPostByParamMiddleware, async (req: Request,
     // unsafe fields
     // if ('createdAt' in req.body) post.createdAt = req.body.createdAt
 
-    await updatePost(post)
+    try {
+        await updatePost(post)
+    } catch (error) {
+        next(error)
+    }
     res.redirect(`${post.slug ? post.slug : post.id}`)
 })
 
@@ -136,6 +141,8 @@ adminRouter.delete('/post/:postId', findPostByParamMiddleware, async (req: Reque
     await deletePost(post.id)
     res.redirect('/admin')
 })
+
+adminRouter.use(errorHandlerMiddleware('admin'))
 
 adminRouter.use((req: Request, res: Response) => {
     res.status(404).render('admin/error.html', {
