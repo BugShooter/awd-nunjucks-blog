@@ -3,6 +3,7 @@
 node_modules
 dist
 src/data/*.json
+src/data/*.db
 !src/data/*.orig.json
 
 # Ignore logs and zip files

@@ -1,4 +1,5 @@
-import { getAll, create, update, getById, deleteById, generatePostId } from './postFileRepository.js'
+// import { getAll, create, update, getById, deleteById, generatePostId } from './postFileRepository.js'
+import { getAll, create, update, getById, deleteById, generatePostId } from './postSQLiteRepository.js'
 
 class ValidationError extends Error { }
 class OperationError extends Error { }
