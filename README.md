@@ -438,3 +438,53 @@ const decoded = decode(encoded)
 ```
 This will encode HTML entities in the input, making it safe to store and display.
 
+### Installing sqlite3 package
+To use SQLite with Node.js, you can install the `sqlite3` package. This package provides a simple interface for interacting with SQLite databases.
+
+```bash
+npm install sqlite3
+npm install --save-dev @types/sqlite3
+```
+You can then use it in your application like this:
+
+```typescript
+import sqlite3 from 'sqlite3'
+
+const db = new sqlite3.Database('database.db')
+db.serialize(() => {
+    db.run('CREATE TABLE IF NOT EXISTS posts (id INTEGER PRIMARY KEY, title TEXT, content TEXT)')
+})
+```
+
+Common queries example:
+
+```typescript
+db.serialize(() => {
+    // Create a table
+    db.run('CREATE TABLE IF NOT EXISTS posts (id INTEGER PRIMARY KEY, title TEXT, content TEXT)')
+})
+// Insert a new post
+db.run('INSERT INTO posts (title, content) VALUES (?, ?)', ['Post Title', 'Post content'])
+// Select all posts
+db.all('SELECT * FROM posts', [], (err, rows) => {
+    if (err) {
+        throw err;
+    }
+    rows.forEach((row) => {
+        console.log(row);
+    });
+})// Update a post
+db.run('UPDATE posts SET title = ? WHERE id = ?', ['Updated Title', 1])
+// Delete a post
+db.run('DELETE FROM posts WHERE id = ?', [1])
+// Close the database connection
+db.close((err) => {
+    if (err) {
+        console.error('Error closing the database connection:', err.message);
+    } else {
+        console.log('Database connection closed.');
+    }
+})
+```
+We use `db.serialize` to ensure that our database operations are executed in order, one after the other. This is important because SQLite can only execute one statement at a time, and using `db.serialize` helps us avoid potential issues with concurrent operations.
+Without `db.serialize`, if you try to run multiple queries at the same time, you might encounter errors or unexpected behavior, as SQLite will not be able to handle them correctly. By wrapping your database operations in `db.serialize`, you ensure that each operation is completed before the next one starts, maintaining the integrity of your database interactions.

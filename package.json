@@ -23,7 +23,8 @@
         "express": "^5.1.0",
         "nunjucks": "^3.2.4",
         "sanitize-html": "^2.17.0",
-        "slug": "^11.0.0"
+        "slug": "^11.0.0",
+        "sqlite3": "^5.1.7"
     },
     "devDependencies": {
         "@types/express": "^5.0.3",
@@ -31,6 +32,7 @@
         "@types/nunjucks": "^3.2.6",
         "@types/sanitize-html": "^2.16.0",
         "@types/slug": "^5.0.9",
+        "@types/sqlite3": "^5.1.0",
         "nodemon": "^3.1.10",
         "nunjucks-date-filter": "^0.1.1",
         "prettier": "^3.6.2",
