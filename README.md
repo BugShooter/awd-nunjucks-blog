@@ -98,8 +98,8 @@ This configuration file for TypeScript specifies:
 {
     "watch": ["src"],
     "ext": "ts,json,html",
-    "ignore": ["node_modules", "dist"],
-    "exec": "ts-node src/index.ts"
+    "ignore": ["node_modules", "dist", "src/data/*.json"],
+    "exec": "npm run copy:orig && node --import ./register.mjs src/index.ts"
 }
 ```
 
@@ -136,22 +136,28 @@ This configuration file for Prettier specifies:
 ```json
 {
     "scripts": {
-        "build": "tsc",
-        "start": "node dist/index.js",
-        "dev": "nodemon src/index.ts",
+        "copy:orig": "bash -c 'for f in src/data/*.orig.json; do cp -f \"$f\" \"${f/orig.json/json}\"; done' && echo 'Copied orig files to json' && cp -r src/data dist/",
+        "build": "tsc && npm run copy:orig",
+        "clean": "rm -rf dist",
+        "dev": "nodemon",
         "watch": "tsc --watch",
-        "format": "prettier --write ."
+        "format": "prettier --write .",
+        "format:check": "prettier --check .",
+        "start": "npm run build && node dist/index.js",
     }
 }
 ```
 
 This configuration adds the following scripts:
 
-- `build`: Compiles TypeScript files to JavaScript.
-- `start`: Starts the application using the compiled JavaScript files in the `dist` directory.
+- `copy:orig`: Copies `.orig.json` files to `.json` files in the `src/data` directory and also copies the `src/data` directory to `dist`.
+- `build`: Compiles TypeScript files to JavaScript and runs the `copy:orig` script.
+- `clean`: Removes the `dist` directory.
 - `dev`: Starts the development server with Nodemon, watching for changes in TypeScript files.
 - `watch`: Watches for changes in TypeScript files and recompiles them automatically.
 - `format`: Formats the code using Prettier.
+- `format:check`: Checks if the code is formatted according to Prettier rules.
+- `start`: Builds the project and starts the server using the compiled JavaScript files.
 
 8. Create the project structure:
 

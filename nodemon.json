@@ -2,5 +2,5 @@
     "watch": ["src"],
     "ext": "ts,json,html",
     "ignore": ["node_modules", "dist", "src/data/*.json"],
-    "exec": "npm run copy:orig && ts-node src/index.ts"
+    "exec": "npm run copy:orig && node --import ./register.mjs src/index.ts"
 }
