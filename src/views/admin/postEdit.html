@@ -30,6 +30,16 @@
         {# <div class="row gx-4 gx-lg-5 justify-content-center">
             <div class="col-md-10 col-lg-8 col-xl-7">{{ post.content | safe }}</div>
         </div> #}
+        {% if errors %}
+        <div class="alert alert-danger" role="alert">
+            <h4 class="alert-heading">Validation Errors</h4>
+            <ul>
+                {% for field, message in errors %}
+                <li>{{ field }}: {{ message }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
         <div class="row gx-4 gx-lg-5 justify-content-center">
             <div class="col-md-10 col-lg-8 col-xl-7">
                 <form id="postForm" action="{{ 'admin/post/' ~ id }}" method="post">

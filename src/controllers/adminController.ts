@@ -1,6 +1,6 @@
 import express from "express"
 import type { Router, Request, Response, NextFunction } from "express"
-import { createPost, deletePost, getAllPosts, updatePost } from "../models/postModel.js";
+import { createPost, deletePost, getAllPosts, updatePost, ValidationError } from "../models/postModel.js";
 import sanitizeHtml from 'sanitize-html'
 import errorHandlerMiddleware from "../middlewares/errorHandlerMiddleware.js";
 
@@ -101,8 +101,22 @@ adminRouter.post('/post', async (req: Request, res: Response) => {
         createdAt: Math.floor(Date.now() / 1000),
     }
     const sanitizedPostDraft = sanitizePost(postDraft)
-    post = await createPost(sanitizedPostDraft)
-    res.redirect(`/admin/post/${post.slug ? post.slug : post.id}`)
+    try {
+        post = await createPost(sanitizedPostDraft)
+        res.redirect(`/admin/post/${post.slug ? post.slug : post.id}`)
+    } catch (error) {
+        if (error instanceof ValidationError) {
+            const errors = {
+                [error.field]: error.message
+            }
+            res.render('admin/postCreate.html', {
+                post: postDraft,
+                errors
+            })
+        } else {
+            throw error
+        }
+    }
 })
 
 adminRouter.get('/post/:postId', findPostByParamMiddleware, (req: Request, res: Response) => {
@@ -128,11 +142,21 @@ adminRouter.put('/post/:postId', findPostByParamMiddleware, async (req: Request,
     // if ('createdAt' in req.body) post.createdAt = req.body.createdAt
 
     try {
-        await updatePost(post)
+        post = await updatePost(post)
+        res.redirect(`${post.slug ? post.slug : post.id}`)
     } catch (error) {
-        next(error)
+        if (error instanceof ValidationError) {
+            const errors = {
+                [error.field]: error.message
+            }
+            res.render('admin/postEdit.html', {
+                post,
+                errors
+            })
+        } else {
+            next(error)
+        }
     }
-    res.redirect(`${post.slug ? post.slug : post.id}`)
 })
 
 adminRouter.delete('/post/:postId', findPostByParamMiddleware, async (req: Request, res: Response) => {
