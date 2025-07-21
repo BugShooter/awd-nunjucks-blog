@@ -3,14 +3,18 @@ import { randomUUID } from 'node:crypto'
 import { enrichPosts } from './postRepository.js'
 import { closeDB, connectDB, getDB } from '../db/database.js'
 
+function beautifySql(sql: string): string {
+    return sql.split('\n').join(' ').replace(/\s+/g, ' ').trim()
+}
+
 // const dataPath = path.join(import.meta.dirname, '../data/blog.db')
 try {
     await connectDB()
     console.log('Connected to the SQLite database')
 } catch (error) {
     const message = error instanceof Error
-    ? error.message
-    : error
+        ? error.message
+        : error
     console.log('Error connect to database: ', message)
     process.exit(1);
 }
@@ -49,8 +53,10 @@ export async function getAll<K extends keyof Post>(resultFields?: K[]): Promise<
     // const rawPosts: Post[] = JSON.parse(json)
 
     const rawPosts: Post[] = await new Promise((resolve, reject) => {
-        db.all<Post>(
-            `SELECT * FROM posts`,
+        const sql = resultFields
+            ? beautifySql(`SELECT ${resultFields.join(',')} FROM posts`)
+            : beautifySql(`SELECT * FROM posts`)
+        db.all<Post>(sql,
             [],
             (err: Error | null, rows: Post[]) => {
                 if (err) {
@@ -79,10 +85,12 @@ export async function getAll<K extends keyof Post>(resultFields?: K[]): Promise<
 }
 
 export async function create(post: Post): Promise<Post> {
-   try {
-        // await writeFile(dataPath, JSON.stringify(_posts, null, 4))
+    try {
         await new Promise((resolve, reject) => {
-            db.run('INSERT INTO posts (id,slug,title,teaser,content,image,author,createdAt) VALUES (?,?,?,?,?,?,?,?)', [
+            const sql = beautifySql(`INSERT INTO posts 
+                (id,slug,title,teaser,content,image,author,createdAt)
+                VALUES (?,?,?,?,?,?,?,?)`)
+            db.run(sql, [
                 post.id,
                 post.slug,
                 post.title,
@@ -108,49 +116,116 @@ export async function create(post: Post): Promise<Post> {
     }
 }
 
-// TODO
 export async function update(post: Post): Promise<Post> {
-    // const posts = await getAll()
-
-    // let newPosts = posts.filter(p => p.id !== post.id)
-    // newPosts = [...newPosts, post]
-
-    // await writeFile(dataPath, JSON.stringify(newPosts, null, 4))
-
-    return post
+    try {
+        await new Promise((resolve, reject) => {
+            const sql = beautifySql(`UPDATE posts
+                SET slug=?,title=?,teaser=?,content=?,image=?,author=?
+                WHERE id=?`)
+            db.run(sql, [
+                post.slug,
+                post.title,
+                post.teaser,
+                post.content,
+                post.image,
+                post.author,
+                post.id
+            ],
+                (err: Error | null, result: unknown) => {
+                    // NOTE: result is undefined
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve(result);
+                    }
+                }
+            );
+        });
+        // FIXME: need to get a new post from DB?
+        return post
+    } catch (err) {
+        console.error(err)
+        throw err
+    }
 }
 
-// TODO
 export async function getById(postId: string): Promise<Post> {
-    let posts = await getAll()
-    const post = posts.find(p => p.id === postId)
-    if (post === undefined) {
-        throw new Error(`Post ID:'${postId}' not found`)
+    try {
+        const post = await new Promise<Post>((resolve, reject) => {
+            const sql = beautifySql(`SELECT *
+                FROM posts
+                WHERE id=?`)
+            db.get<Post>(sql, [
+                postId,
+            ],
+                (err: Error | null, row: Post) => {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve(row);
+                    }
+                }
+            );
+        })
+        if (post === undefined) {
+            throw new Error(`Post ID:'${postId}' not found`)
+        }
+        return post
+    } catch (err) {
+        console.error(err)
+        throw err
     }
-
-    return post
 }
 
-// TODO
 async function isExistById(postId: string): Promise<boolean> {
-    let posts = await getAll()
-
-    if (posts.findIndex(p => p.id === postId) === -1) {
-        return false
+    try {
+        // NOTE: we can select only ID
+        const post = await new Promise<string>((resolve, reject) => {
+            const sql = beautifySql(`SELECT id
+                FROM posts
+                WHERE id=?`)
+            db.get<string>(sql, [
+                postId,
+            ],
+                (err: Error | null, row: string) => {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve(row);
+                    }
+                }
+            );
+        })
+        if (post === undefined) {
+            return false
+        }
+        return true
+    } catch (err) {
+        console.error(err)
+        throw err
     }
-
-    return true
 }
 
-// TODO
 export async function deleteById(postId: string): Promise<void> {
-    // const posts = await getAll()
-
-    // if (await isExistById(postId)) {
-    //     return
-    // }
-
-    // let newPosts = posts.filter(p => p.id !== postId)
-
-    // await writeFile(dataPath, JSON.stringify(newPosts, null, 4))
+    try {
+        await new Promise((resolve, reject) => {
+            db.run(`
+                DELETE FROM posts
+                WHERE id=?`.trim(), [
+                postId
+            ],
+                (err: Error | null, result: unknown) => {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve(result);
+                    }
+                }
+            );
+        });
+        return
+    } catch (err) {
+        console.error(err)
+        throw err
+    }
 }

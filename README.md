@@ -473,7 +473,15 @@ db.all('SELECT * FROM posts', [], (err, rows) => {
     rows.forEach((row) => {
         console.log(row);
     });
-})// Update a post
+})
+// Select a post by ID
+db.get('SELECT * FROM posts WHERE id = ?', [1], (err, row) => {
+    if (err) {
+        throw err;
+    }
+    console.log(row);
+})
+// Update a post
 db.run('UPDATE posts SET title = ? WHERE id = ?', ['Updated Title', 1])
 // Delete a post
 db.run('DELETE FROM posts WHERE id = ?', [1])
